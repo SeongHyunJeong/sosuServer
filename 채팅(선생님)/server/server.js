@@ -17,6 +17,7 @@ server.on('connection', client => {
         console.log(`[채팅] ${clientInfos[client.id].nickname}: ${data.message}`);
 
         // 명령어 처리
+        // /nick dsfajldfldasjkl
         if(data.message.startsWith('/')) {
             if(data.message.startsWith('/nick ')) {
                 let splitted = data.message.split(' ');
@@ -25,7 +26,27 @@ server.on('connection', client => {
 
                 server.emit('change nickname', {old:oldNickname, new:splitted[1]});
             } else if(data.message.startsWith('/w')) {
-                // 귓속말 구현
+                // 귀속말
+                let targetNicknameIndex = data.message.indexOf(' ') + 1;
+                let chatBodyIndex = data.message.indexOf(' ', 3) + 1;
+                
+                let targetNickname = data.message.substr(targetNicknameIndex, chatBodyIndex - targetNicknameIndex - 1);
+                data.message = data.message.substr(chatBodyIndex);
+                
+                let targetSocket = null;
+                for(let id in clientInfos) {
+                    let clientData = clientInfos[id];
+                    if(clientData.nickname == targetNickname) {
+                        targetSocket = clientData.socket;
+                        break;
+                    }
+                }
+
+                if(targetSocket !== null) {
+                    targetSocket.emit('whisper', {nickname: clientInfos[client.id].nickname, message: data.message});
+                } else {
+                    client.emit('whisper fail', {message: `유저가 존재하지 않습니다: ${targetNickname}`});
+                }
             }
         } else {
             data.nickname = clientInfos[client.id].nickname;

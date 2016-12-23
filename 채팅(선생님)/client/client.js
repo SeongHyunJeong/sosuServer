@@ -27,9 +27,12 @@ function onLoad() {
     });
 
     socket.on('chat', data => {
-        chatContainer.innerHTML += `${data.nickname} : ${data.message}\n`;
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        addMessage(data, false);
     });
+
+    socket.on('whisper', data => {
+        addMessage(data, true);
+    })
 
     socket.on('change nickname', data => {
         chatContainer.innerHTML += `${data.old}님이 ${data.new}로 닉네임을 변경하셨습니다.\n`;
@@ -38,4 +41,15 @@ function onLoad() {
     socket.on('user disconnected', data => {
         chatContainer.innerHTML += `${data.nickname}님이 접속을 종료하였습니다.\n`;
     });
+
+
+    function addMessage(data, isWhisper) {
+        if(isWhisper) {
+            chatContainer.innerHTML += `${data.nickname}님으로 부터 온 귓속말 : ${data.message}\n`;
+        } else {
+            chatContainer.innerHTML += `${data.nickname} : ${data.message}\n`;
+        }
+        
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
 }

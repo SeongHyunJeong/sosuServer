@@ -3,7 +3,7 @@ var nickname = prompt("닉네임 입력","");
 
 function button1_click() {
 	var val3 = $('#texta').val();
-    console.log(val3);
+    document.write(val3);
     socket.emit("form_client", nickname+":"+val3);
 }
 
@@ -13,7 +13,7 @@ function button2_click() {
 
 
 socket.on('welcome message',(data) => {
-    console.log(data.message);
+    document.write(data.message);
                     
 
     //socket.disconnect();
